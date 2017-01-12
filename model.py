@@ -9,13 +9,13 @@ from itsdangerous import(TimedJSONWebSignatureSerializer as Serializer, BadSigna
 Base = declarative_base()
 #secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
 
-# class Inventory(Base):
-#     __tablename__ = 'inventory'
-#     id = Column(Integer, primary_key=True)
-#     product_id = Column(Integer, ForeignKey('product.id'))
-#     quantity = Column(Integer)
-#     last_filled = Column(DateTime, default=func.now())
-#     product = relationship("Product", back_populates="inventory")
+ # class Inventory(Base):
+ #     __tablename__ = 'inventory'
+ #     id = Column(Integer, primary_key=True)
+ #     product_id = Column(Integer, ForeignKey('product.id'))
+ #     quantity = Column(Integer)
+ #     last_filled = Column(DateTime, default=func.now())
+ #     product = relationship("Product", back_populates="inventory")
 
 
 class Customer(Base):

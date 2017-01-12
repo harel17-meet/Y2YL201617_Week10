@@ -1,0 +1,15 @@
+<!doctype html>
+<title>Hello from Flask</title>
+{%if productInventory==[]%}
+<p>there are currently nothing here</p>
+{% else %}
+<div class="product">
+	{% for product in productInventory %}
+	<a href={{url_for('product', product_id = product.id)}}>
+		<p>{{product.name}}</p>
+		<img src={{product.photo}} height="250">
+	</a>
+	{% endfor %}
+</div>
+{% endif %}
+</html>
