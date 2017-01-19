@@ -75,18 +75,57 @@ def addToCart(product_id):
 	if 'id' not in login_session:
 		flash("You must be logged in to perform this action")
 		return redirect(url_for('login'))
-
+	quantity = request.form['quantity']
+	product = session.query(Product).filter_by(id=product_id).one()
+	shoppingCart = session.query(ShoppingCart).filter_by(customer_id=login_session['id']).one()
+	if product.name in [item.product.name for item in shoppingCart.products]:
+		assoc = session.query(ShoppingCartAssociation).filter_by(shoppingCart=shoppingCart).filter_by(product=product).one()
+		assoc.quantity = int(assoc.quantity) + int(quantity)
+		flash("Successfully added to Shopping Cart")
+		return redirect(url_for('shoppingCart'))
+	else:
+		a = ShoppingCartAssociation(product=product, quantity=quantity)
+		shoppingCart.products.append(a)
+		session.add_all([a, product, shoppingCart])
+		session.commit()
+		flash("SUccesfully adfed to Shopping Cart")
+		return redirect(url_for('shoppingCart'))	
 @app.route("/shoppingCart")
 def shoppingCart():
-	
-	return render_template('shoppingCart.html', name=name)
+	if 'id' not in login_session:
+		flash("You must be logged in to perform this action")
+		return redirect(url_for('login'))
+	shoppingCart = session.query(ShoppingCart).filter_by(customer_id=login_session['id']).one()
+	return render_template('shoppingCart.html', shoppingCart = shoppingCart)
 @app.route("/removeFromCart/<int:product_id>", methods = ['POST'])
 def removeFromCart(product_id):
-	return "To be implmented"
-
+	if 'id' not in login_session:
+		flash("You must be logged in to perform this action")
+		return redirect(url_for('login'))
+	shoppingCart = session.query(ShoppingCart).filter_by(customer_id=login_session['id']).one()
+	association = session.query(ShoppingCartAssociation).filter_by(shoppingCart=shoppingCart).filter_by(product_id=product_id).one()
+	session.delete(association)
+	session.commit()
+	flash("Item deleted successfully")
+	return redirect(url_for('shoppingCart'))
 @app.route("/updateQuantity/<int:product_id>", methods = ['POST'])
 def updateQuantity(product_id):
-	return "To be implemented"
+	if 'id' not in login_session:
+		flash("TYou must be logged in to perform this action")
+		return redirect(url_for('login'))
+	quantity = request.form['quantity']
+	if quantity = 0:
+		return removeFromCart(product_id)
+	if quantity < 0:
+		flash("Cant store negative quantities because that would be silly.")
+		return redirect(url_for('shoppingCart'))
+	shoppingCart = session.query(shoppingCart).filter_by(customer_id=login_session['id']).one()
+	assoc = session.query(ShoppingCartAssociation).filter_by(shoppingCart=shoppingCart).filter_by(product_id=product_id).one()
+	assoc.quantity = quantity
+	session.add(assoc)
+	session.commit()
+	flash("Quantity Updated Successfully")
+	return redirect(url_for('shoppingCart'))
 
 @app.route("/checkout", methods = ['GET', 'POST'])
 def checkout():
